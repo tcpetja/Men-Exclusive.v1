@@ -2,7 +2,7 @@
   "name": "men-exclusive",
   "version": "1.0.0",
   "private": true,
-  "description": "MEN EXCLUSIVE — luxury menswear e-commerce store (South Africa)",
+  "description": "MEN EXCLUSIVE \u2014 luxury menswear e-commerce store (South Africa)",
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
@@ -16,7 +16,9 @@
     "admin:create": "tsx scripts/create-admin.ts",
     "yoco:webhook": "tsx scripts/yoco-webhook.ts",
     "yoco:mock": "tsx scripts/mock-yoco.ts",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "vercel-build": "prisma generate && prisma migrate deploy && tsx prisma/seed.ts && next build",
+    "test:payments": "tsx tests/manual/payment-edge-cases.ts"
   },
   "engines": {
     "node": ">=20.9"
