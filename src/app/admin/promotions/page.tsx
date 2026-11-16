@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { deleteBannerAction, deletePromoAction, saveBannerAction, savePromoAction } from '@/app/actions/admin'
-import { ACheck, AdminForm, AField, ConfirmButton } from '@/components/admin/AdminForm'
+import { ACheck, AdminForm, AField, ConfirmSubmit } from '@/components/admin/AdminForm'
 import { db } from '@/lib/db'
 import { centsToRandsInput, formatZAR } from '@/lib/money'
 
@@ -56,7 +56,7 @@ export default async function AdminPromotions() {
               </span>
             </summary>
             <div className="a-details-body">
-              <AdminForm action={saveBannerAction} hidden={{ id: b.id }} extra={<ConfirmButton action={deleteBannerAction} hidden={{ id: b.id }} label="Delete" confirm="Delete this announcement?" />}>
+              <AdminForm action={saveBannerAction} hidden={{ id: b.id }} extra={<ConfirmSubmit action={deleteBannerAction} label="Delete" confirm="Delete this announcement?" />}>
                 <AField label="Announcement" name="text" defaultValue={b.text} required />
                 <div className="a-row a-row-3">
                   <AField label="Link (optional)" name="linkUrl" defaultValue={b.linkUrl} placeholder="/shop" />
@@ -101,7 +101,7 @@ export default async function AdminPromotions() {
               </span>
             </summary>
             <div className="a-details-body">
-              <AdminForm action={savePromoAction} hidden={{ id: p.id }} extra={<ConfirmButton action={deletePromoAction} hidden={{ id: p.id }} label="Delete" confirm={`Delete the code ${p.code}?`} />}>
+              <AdminForm action={savePromoAction} hidden={{ id: p.id }} extra={<ConfirmSubmit action={deletePromoAction} label="Delete" confirm={`Delete the code ${p.code}?`} />}>
                 <PromoFields p={p} />
               </AdminForm>
             </div>

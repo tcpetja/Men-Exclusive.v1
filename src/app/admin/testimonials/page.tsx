@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { deleteTestimonialAction, saveTestimonialAction } from '@/app/actions/admin'
-import { ACheck, AdminForm, AField, ConfirmButton } from '@/components/admin/AdminForm'
+import { ACheck, AdminForm, AField, ConfirmSubmit } from '@/components/admin/AdminForm'
 import { db } from '@/lib/db'
 
 export const metadata: Metadata = { title: 'Testimonials' }
@@ -43,7 +43,7 @@ export default async function AdminTestimonials() {
               </span>
             </summary>
             <div className="a-details-body">
-              <AdminForm action={saveTestimonialAction} hidden={{ id: t.id }} extra={<ConfirmButton action={deleteTestimonialAction} hidden={{ id: t.id }} label="Delete" confirm="Delete this testimonial?" />}>
+              <AdminForm action={saveTestimonialAction} hidden={{ id: t.id }} extra={<ConfirmSubmit action={deleteTestimonialAction} label="Delete" confirm="Delete this testimonial?" />}>
                 <Fields t={t} />
               </AdminForm>
             </div>

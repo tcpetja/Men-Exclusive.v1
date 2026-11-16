@@ -10,7 +10,7 @@
  * Card details never touch this website — they are entered on Yoco's page.
  */
 import { createHmac, timingSafeEqual } from 'node:crypto'
-import { siteUrl } from './settings'
+import { siteUrl } from './site-url'
 
 export type YocoMode = 'test' | 'live'
 

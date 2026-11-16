@@ -7,6 +7,7 @@ import { WhatsAppButton } from '@/components/WhatsApp'
 import { getCurrentUser } from '@/lib/auth'
 import { orderStatusLabel } from '@/lib/constants'
 import { db } from '@/lib/db'
+import { emailConfigured } from '@/lib/email'
 import { formatZAR } from '@/lib/money'
 import { addressLines, getSettings } from '@/lib/settings'
 import { waMessages } from '@/lib/whatsapp'
@@ -66,7 +67,7 @@ export default async function OrderPage({ params, searchParams }: Props) {
         <h1 className="display">{heading}</h1>
         {!pending && !closed && order.status === 'PAID' && (
           <p className="lede">
-            Your payment has been received and your order is confirmed. We have emailed a confirmation to {order.email}.
+            Your payment has been received and your order is confirmed.{emailConfigured() ? ` We have emailed a confirmation to ${order.email}.` : ''}
           </p>
         )}
         <div>

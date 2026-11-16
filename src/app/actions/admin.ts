@@ -9,7 +9,7 @@ import { COLOUR_FAMILIES } from '@/lib/constants'
 import { CONTENT_BY_KEY } from '@/content/defaults'
 import { db } from '@/lib/db'
 import { loadEditorProduct, type EditorProduct } from '@/lib/admin-product'
-import { sendOrderConfirmation } from '@/lib/email'
+import { emailConfigured, sendOrderConfirmation } from '@/lib/email'
 import { formatZAR, parseRandsToCents } from '@/lib/money'
 import { applyRefund, canRefund, changeOrderStatus, notifyStatus } from '@/lib/orders'
 import { DEFAULT_SETTINGS, saveSettings, type StoreSettings } from '@/lib/settings'
@@ -25,6 +25,7 @@ const int = (form: FormData, key: string, fallback = 0) => {
 }
 const refresh = () => revalidatePath('/', 'layout')
 const saved = (message = 'Saved.'): ActionState => ({ ok: true, message })
+const emailed = () => (emailConfigured() ? 'The customer has been emailed.' : 'Email is not connected yet, so the customer was NOT emailed. Let them know yourself.')
 const failed = (message: string, fields?: FieldErrors): ActionState => ({ ok: false, message, fields })
 
 // ───────────────────────── Store settings ─────────────────────────
@@ -289,7 +290,7 @@ export async function orderStatusAction(_prev: ActionState, form: FormData): Pro
     return failed(err instanceof Error ? err.message : 'The status could not be changed.')
   }
   revalidatePath('/admin', 'layout')
-  return saved('Status updated. The customer has been emailed.')
+  return saved(`Status updated. ${emailed()}`)
 }
 
 export async function orderNoteAction(_prev: ActionState, form: FormData): Promise<ActionState> {
@@ -366,7 +367,7 @@ export async function orderManualRefundAction(_prev: ActionState, form: FormData
   const applied = await applyRefund(order.id, order.totalCents, true, `Recorded as refunded in full outside the website${str(form, 'note') ? `: ${str(form, 'note').slice(0, 200)}` : ''}.`, admin.email)
   if (applied) after(() => notifyStatus(order.id))
   revalidatePath('/admin', 'layout')
-  return saved('Order marked as refunded. The customer has been emailed.')
+  return saved(`Order marked as refunded. ${emailed()}`)
 }
 
 // ───────────────────────── Products ─────────────────────────

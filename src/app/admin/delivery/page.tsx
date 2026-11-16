@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { deleteDeliveryAction, saveDeliveryAction } from '@/app/actions/admin'
-import { ACheck, AdminForm, AField, ConfirmButton } from '@/components/admin/AdminForm'
+import { ACheck, AdminForm, AField, ConfirmSubmit } from '@/components/admin/AdminForm'
 import { db } from '@/lib/db'
 import { centsToRandsInput, formatZAR } from '@/lib/money'
 
@@ -58,7 +58,7 @@ export default async function AdminDelivery() {
               </span>
             </summary>
             <div className="a-details-body">
-              <AdminForm action={saveDeliveryAction} hidden={{ id: m.id }} extra={<ConfirmButton action={deleteDeliveryAction} hidden={{ id: m.id }} label="Delete" confirm={`Delete "${m.name}"?`} />}>
+              <AdminForm action={saveDeliveryAction} hidden={{ id: m.id }} extra={<ConfirmSubmit action={deleteDeliveryAction} label="Delete" confirm={`Delete "${m.name}"?`} />}>
                 <Fields m={m} />
               </AdminForm>
             </div>

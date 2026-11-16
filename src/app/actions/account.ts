@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
-import { createSession, destroySession, getCurrentUser, hashPassword, newToken, requireUser, safeNext, sha256, verifyPassword } from '@/lib/auth'
+import { createSession, destroySession, hashPassword, newToken, requireUser, safeNext, sha256, verifyPassword } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { sendPasswordReset } from '@/lib/email'
 import { clientIp, rateLimit } from '@/lib/rate-limit'
@@ -171,10 +171,4 @@ export async function setDefaultAddressAction(form: FormData) {
     db.address.update({ where: { id }, data: { isDefault: true } }),
   ])
   revalidatePath('/account/addresses')
-}
-
-/** Used by forms that only need to know whether someone is signed in. */
-export async function whoAmI() {
-  const user = await getCurrentUser()
-  return user ? { firstName: user.firstName } : null
 }

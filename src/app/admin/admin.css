@@ -11,6 +11,7 @@
   --a-ok: #2f6b3a;
   --a-warn: #8a5a00;
   --a-bad: #a3301c;
+  color-scheme: light;
   min-height: 100vh;
   background: var(--a-bg);
   color: var(--a-ink);
@@ -18,9 +19,6 @@
   line-height: 1.55;
   display: grid;
   grid-template-columns: 1fr;
-}
-.admin a {
-  color: inherit;
 }
 .admin :focus-visible {
   outline: 2px solid var(--a-gold);

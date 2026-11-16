@@ -623,12 +623,50 @@ ol {
 .nav {
   display: none;
 }
+.only-desktop {
+  display: none;
+}
+/* Phones: two icons each side keeps the wordmark truly centred. */
+@media (max-width: 1079px) {
+  .header-bar {
+    gap: 4px;
+  }
+  .iconbtn {
+    width: 40px;
+  }
+  .wordmark {
+    gap: 8px;
+  }
+  .wordmark img {
+    width: 30px;
+    height: 30px;
+  }
+  .wordmark-name {
+    font-size: clamp(0.6rem, 3vw, 0.86rem);
+    letter-spacing: 0.18em;
+    margin-right: -0.18em;
+  }
+  .wordmark-tag {
+    font-size: clamp(0.36rem, 1.55vw, 0.46rem);
+    letter-spacing: 0.38em;
+    margin-right: -0.38em;
+  }
+}
+@media (max-width: 379px) {
+  .wordmark img {
+    display: none;
+  }
+}
 @media (min-width: 1080px) {
   :root {
     --header-h: 76px;
   }
-  .menu-toggle {
+  .menu-toggle,
+  .only-mobile {
     display: none;
+  }
+  .only-desktop {
+    display: inline-grid;
   }
   .header-cta {
     display: inline-flex;
@@ -914,6 +952,15 @@ ol {
 .window-cap b {
   font-weight: 600;
   color: var(--champagne);
+}
+@media (max-width: 599px) {
+  /* Three photographs side by side leave no room for captions on a phone; each still links to its suit. */
+  .window-cap {
+    display: none;
+  }
+  .window-item::after {
+    display: none;
+  }
 }
 .window-cap span {
   color: var(--gold-3);

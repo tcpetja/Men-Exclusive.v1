@@ -379,7 +379,6 @@ export function CheckoutForm({ paymentsReady, testMode, whatsappHref, customer, 
             .
           </span>
         </label>
-        {err('acceptTerms')}
 
         {message && (
           <p id="checkout-message" className="notice notice-error" role="alert">

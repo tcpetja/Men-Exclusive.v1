@@ -66,6 +66,9 @@ export function HeaderClient({ whatsappHref, banner, signedIn, isAdmin }: Props)
             <button type="button" className="iconbtn menu-toggle" onClick={() => setMenuOpen(true)} aria-label="Open menu" aria-expanded={menuOpen}>
               <IconMenu />
             </button>
+            <button type="button" className="iconbtn only-mobile" onClick={() => setSearchOpen(true)} aria-label="Search">
+              <IconSearch />
+            </button>
             <Link href="/book" className="header-cta">
               <IconCalendar />
               Book an appointment
@@ -85,7 +88,7 @@ export function HeaderClient({ whatsappHref, banner, signedIn, isAdmin }: Props)
           </Link>
 
           <div className="header-side header-side-end">
-            <button type="button" className="iconbtn" onClick={() => setSearchOpen(true)} aria-label="Search">
+            <button type="button" className="iconbtn only-desktop" onClick={() => setSearchOpen(true)} aria-label="Search">
               <IconSearch />
             </button>
             <Link href={signedIn ? '/account' : '/account/login'} className="iconbtn" aria-label={signedIn ? 'Your account' : 'Sign in'}>

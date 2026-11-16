@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { deleteCategoryAction, saveCategoryAction, saveOccasionAction } from '@/app/actions/admin'
-import { AdminForm, AField, ConfirmButton } from '@/components/admin/AdminForm'
+import { AdminForm, AField, ConfirmSubmit } from '@/components/admin/AdminForm'
 import { db } from '@/lib/db'
 
 export const metadata: Metadata = { title: 'Suit types and occasions' }
@@ -33,7 +33,7 @@ export default async function AdminCatalogue() {
               <AdminForm
                 action={saveCategoryAction}
                 hidden={{ id: c.id }}
-                extra={c._count.products === 0 ? <ConfirmButton action={deleteCategoryAction} hidden={{ id: c.id }} label="Delete" confirm={`Delete the suit type "${c.name}"?`} /> : undefined}
+                extra={c._count.products === 0 ? <ConfirmSubmit action={deleteCategoryAction} label="Delete" confirm={`Delete the suit type "${c.name}"?`} /> : undefined}
               >
                 <div className="a-row a-row-3">
                   <AField label="Name" name="name" defaultValue={c.name} required />

@@ -63,6 +63,26 @@ export function ConfirmButton({ action, hidden, label, confirm, className = 'a-b
   )
 }
 
+/**
+ * A confirm-then-run button for use INSIDE an AdminForm: it submits the surrounding form's fields
+ * (including its hidden id) to a different server action, so no nested form is needed.
+ */
+export function ConfirmSubmit({ action, label, confirm }: { action: (form: FormData) => Promise<void>; label: string; confirm: string }) {
+  return (
+    <button
+      type="submit"
+      formAction={action}
+      formNoValidate
+      className="a-btn a-btn-sm a-btn-danger"
+      onClick={(e) => {
+        if (!window.confirm(confirm)) e.preventDefault()
+      }}
+    >
+      {label}
+    </button>
+  )
+}
+
 type InputProps = {
   label: string
   name: string

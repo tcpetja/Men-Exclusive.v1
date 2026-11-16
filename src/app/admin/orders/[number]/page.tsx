@@ -6,6 +6,7 @@ import { ACheck, AdminForm, AField } from '@/components/admin/AdminForm'
 import { StatusPill, fmtDateTime } from '@/components/admin/bits'
 import { allowedTransitions, orderStatusLabel } from '@/lib/constants'
 import { db } from '@/lib/db'
+import { emailConfigured } from '@/lib/email'
 import { formatZAR } from '@/lib/money'
 import { canRefund } from '@/lib/orders'
 import { waLink, waMessages } from '@/lib/whatsapp'
@@ -136,7 +137,7 @@ export default async function AdminOrder({ params }: { params: Promise<{ number:
               </p>
             ) : (
               <>
-                <p className="a-help">The customer is emailed each time the status changes.</p>
+                <p className="a-help">{emailConfigured() ? 'The customer is emailed each time the status changes.' : 'Email is not connected yet, so customers are not emailed when the status changes.'}</p>
                 <AdminForm action={orderStatusAction} hidden={{ orderId: order.id }} submitLabel="Update status">
                   <AField label="Move this order to" name="to" options={next.map((s) => ({ value: s, label: NEXT_LABEL[s] ?? orderStatusLabel(s, order.fulfilmentType) }))} />
                   {!collection && (
