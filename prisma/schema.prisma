@@ -1,0 +1,419 @@
+// MEN EXCLUSIVE — data model
+// Money is always stored as integer cents in South African Rand (ZAR).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ───────────────────────── Accounts ─────────────────────────
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+model User {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  passwordHash   String
+  firstName      String
+  lastName       String
+  phone          String?
+  role           Role     @default(CUSTOMER)
+  marketingOptIn Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  sessions    Session[]
+  resetTokens PasswordResetToken[]
+  addresses   Address[]
+  orders      Order[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+}
+
+model Address {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipient  String
+  phone      String
+  line1      String
+  line2      String?
+  suburb     String
+  city       String
+  province   String
+  postalCode String
+  isDefault  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+}
+
+// ───────────────────────── Catalogue ─────────────────────────
+
+model Category {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  name        String
+  description String?
+  sortOrder   Int       @default(0)
+  products    Product[]
+}
+
+model Occasion {
+  id           String    @id @default(cuid())
+  slug         String    @unique
+  name         String
+  tagline      String
+  intro        String
+  stylingNotes String    @default("")
+  seoTitle     String?
+  seoDesc      String?
+  sortOrder    Int       @default(0)
+  products     Product[]
+}
+
+model Product {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  sku            String   @unique
+  name           String
+  summary        String   @default("")
+  description    String   @default("")
+  categoryId     String?
+  category       Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  /// Null means "price on request" — the product can be browsed and enquired about but not bought online.
+  priceCents     Int?
+  compareAtCents Int?
+  fit            String   @default("")
+  fabric         String   @default("")
+  /// One specification per line, "Label: value".
+  specs          String   @default("")
+  care           String   @default("")
+  isActive       Boolean  @default(true)
+  isFeatured     Boolean  @default(false)
+  isNewArrival   Boolean  @default(false)
+  isBestSeller   Boolean  @default(false)
+  sortOrder      Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  colours   ProductColour[]
+  images    ProductImage[]
+  occasions Occasion[]
+
+  @@index([categoryId])
+  @@index([isActive])
+}
+
+model ProductColour {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  name      String
+  hex       String   @default("#000000")
+  /// Broad colour group used by the shop filter (see src/lib/constants.ts).
+  family    String   @default("black")
+  sortOrder Int      @default(0)
+
+  variants Variant[]
+  images   ProductImage[]
+
+  @@unique([productId, name])
+}
+
+/// A purchasable unit: one size of one colour of one product. Stock is managed here.
+model Variant {
+  id       String        @id @default(cuid())
+  colourId String
+  colour   ProductColour @relation(fields: [colourId], references: [id], onDelete: Cascade)
+  size     String
+  sku      String?       @unique
+  stock    Int           @default(0)
+  sortOrder Int          @default(0)
+
+  @@unique([colourId, size])
+}
+
+model ProductImage {
+  id        String         @id @default(cuid())
+  productId String
+  product   Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  colourId  String?
+  colour    ProductColour? @relation(fields: [colourId], references: [id], onDelete: SetNull)
+  url       String
+  alt       String         @default("")
+  width     Int            @default(900)
+  height    Int            @default(1200)
+  sortOrder Int            @default(0)
+
+  @@index([productId])
+}
+
+/// Photographs uploaded through the admin dashboard (resized and stored as WebP).
+model MediaAsset {
+  id        String   @id @default(cuid())
+  data      Bytes
+  mime      String
+  width     Int
+  height    Int
+  bytes     Int
+  createdAt DateTime @default(now())
+}
+
+// ───────────────────────── Orders ─────────────────────────
+
+enum OrderStatus {
+  PENDING_PAYMENT
+  PAID
+  PROCESSING
+  READY_FOR_COLLECTION
+  DISPATCHED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum FulfilmentType {
+  COLLECTION
+  DELIVERY
+}
+
+model DeliveryMethod {
+  id            String         @id @default(cuid())
+  name          String
+  type          FulfilmentType
+  feeCents      Int            @default(0)
+  /// Orders at or above this subtotal get this method free. Null = never free.
+  freeOverCents Int?
+  /// Shown to the customer at checkout, e.g. where it applies and how long it takes.
+  description   String         @default("")
+  isActive      Boolean        @default(false)
+  sortOrder     Int            @default(0)
+}
+
+enum PromoType {
+  PERCENT
+  FIXED
+}
+
+model PromoCode {
+  id            String    @id @default(cuid())
+  code          String    @unique
+  type          PromoType
+  /// Percent (1–100) or fixed amount in cents.
+  value         Int
+  minSpendCents Int       @default(0)
+  startsAt      DateTime?
+  endsAt        DateTime?
+  maxUses       Int?
+  usedCount     Int       @default(0)
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  seq         Int         @unique @default(autoincrement())
+  /// Customer-facing reference, e.g. ME-10042.
+  number      String      @unique
+  /// Unguessable token so guests can view their order without an account.
+  publicToken String      @unique
+  userId      String?
+  user        User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  status      OrderStatus @default(PENDING_PAYMENT)
+
+  email     String
+  firstName String
+  lastName  String
+  phone     String
+
+  fulfilmentType     FulfilmentType
+  deliveryMethodName String
+  deliveryNote       String  @default("")
+  shipLine1          String?
+  shipLine2          String?
+  shipSuburb         String?
+  shipCity           String?
+  shipProvince       String?
+  shipPostalCode     String?
+
+  subtotalCents Int
+  discountCents Int     @default(0)
+  deliveryCents Int     @default(0)
+  totalCents    Int
+  promoCode     String?
+  customerNote  String  @default("")
+
+  trackingNumber String?
+  trackingUrl    String?
+
+  yocoCheckoutId String?   @unique
+  yocoRedirectUrl String?
+  yocoPaymentId  String?
+  yocoMode       String?
+  paidAt         DateTime?
+  refundedCents  Int       @default(0)
+  /// True while this order holds stock (decremented from Variant.stock).
+  stockHeld      Boolean   @default(true)
+  /// Set when a payment arrived for an order whose stock had already been released.
+  needsAttention String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items  OrderItem[]
+  events OrderEvent[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([email])
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String?
+  variantId String?
+  name      String
+  sku       String
+  colour    String
+  size      String
+  unitCents Int
+  quantity  Int
+  imageUrl  String?
+  slug      String?
+
+  @@index([orderId])
+}
+
+model OrderEvent {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  /// Short machine label: created, paid, status, note, email, refund, payment_issue …
+  kind      String
+  message   String
+  actor     String   @default("system")
+  createdAt DateTime @default(now())
+
+  @@index([orderId])
+}
+
+/// Every webhook delivery we have accepted — makes processing idempotent.
+model WebhookEvent {
+  id         String   @id
+  type       String
+  payload    Json
+  receivedAt DateTime @default(now())
+}
+
+// ───────────────────────── Enquiries ─────────────────────────
+
+enum RequestStatus {
+  NEW
+  CONFIRMED
+  DONE
+  DECLINED
+}
+
+model Appointment {
+  id            String        @id @default(cuid())
+  name          String
+  phone         String
+  email         String?
+  purpose       String
+  occasion      String?
+  preferredDate String
+  preferredTime String
+  notes         String        @default("")
+  status        RequestStatus @default(NEW)
+  adminNote     String        @default("")
+  createdAt     DateTime      @default(now())
+}
+
+model Enquiry {
+  id        String        @id @default(cuid())
+  name      String
+  email     String?
+  phone     String?
+  topic     String
+  message   String
+  status    RequestStatus @default(NEW)
+  createdAt DateTime      @default(now())
+}
+
+model Subscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  consentAt DateTime @default(now())
+  source    String   @default("footer")
+}
+
+// ───────────────────────── Content ─────────────────────────
+
+model Testimonial {
+  id          String   @id @default(cuid())
+  name        String
+  context     String   @default("")
+  quote       String
+  isPublished Boolean  @default(false)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+}
+
+/// Announcement shown in the bar above the header.
+model Banner {
+  id        String  @id @default(cuid())
+  text      String
+  linkUrl   String?
+  linkLabel String?
+  isActive  Boolean @default(true)
+  sortOrder Int     @default(0)
+}
+
+/// Store settings (contact details, hours, legal details, analytics …).
+model Setting {
+  key   String @id
+  value Json
+}
+
+/// Editable page copy and policies. Missing keys fall back to defaults in src/content/defaults.ts.
+model ContentBlock {
+  key       String   @id
+  body      String
+  updatedAt DateTime @updatedAt
+}
+
+/// Fixed-window request counter used to slow down brute-force and spam.
+model RateLimit {
+  key         String   @id
+  count       Int
+  windowStart DateTime
+}
