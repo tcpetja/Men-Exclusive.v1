@@ -28,7 +28,7 @@ export async function subscribeAction(_prev: ActionState, form: FormData): Promi
   return { ok: true, message: 'Thank you. You are on the list.' }
 }
 
-export type AppointmentState = ActionState & { whatsappUrl?: string }
+export type AppointmentState = (NonNullable<ActionState> & { whatsappUrl?: string }) | null
 
 export async function appointmentAction(_prev: AppointmentState, form: FormData): Promise<AppointmentState> {
   const v = values(form)
