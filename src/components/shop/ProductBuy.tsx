@@ -57,7 +57,7 @@ export function ProductBuy({ product, wa }: { product: BuyProduct; wa: { enquire
 
   return (
     <div className="pdp">
-      <div className="gallery">
+      <div className={images.length > 1 ? 'gallery gallery-multi' : 'gallery'}>
         <div className="gallery-main">
           {image && <Image src={image.url} alt={image.alt || p.name} fill priority sizes="(min-width: 900px) 48vw, 100vw" />}
         </div>

@@ -1617,9 +1617,11 @@ ol {
     align-items: start;
   }
   .gallery {
-    grid-template-columns: 76px 1fr;
     position: sticky;
     top: calc(var(--header-h) + 66px);
+  }
+  .gallery-multi {
+    grid-template-columns: 76px 1fr;
   }
   .gallery-thumbs {
     flex-direction: column;
