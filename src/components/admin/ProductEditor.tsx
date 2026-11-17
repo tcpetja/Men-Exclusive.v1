@@ -83,7 +83,7 @@ export function ProductEditor({ initial, categories, occasions }: { initial: Edi
         const res = await fetch('/api/admin/upload', { method: 'POST', body })
         const json = await res.json().catch(() => ({}))
         if (!res.ok) throw new Error(json.error || 'Upload failed.')
-        setP((prev) => ({ ...prev, images: [...prev.images, { url: json.url, alt: '', width: json.width, height: json.height, colourIndex: prev.colours.length === 1 ? 0 : null }] }))
+        setP((prev) => ({ ...prev, images: [...prev.images, { url: json.url, alt: '', width: json.width, height: json.height, focusX: 50, focusY: 45, colourIndex: prev.colours.length === 1 ? 0 : null }] }))
       } catch (e) {
         setMessage({ ok: false, text: `${file.name}: ${e instanceof Error ? e.message : 'Upload failed.'}` })
       } finally {
@@ -283,12 +283,27 @@ export function ProductEditor({ initial, categories, occasions }: { initial: Edi
 
           <section className="a-card">
             <h2>Photographs</h2>
-            <p className="a-help">The first photograph is the one shown in the shop. Use real photographs of the garment. Link a photograph to a colour so it shows when the customer picks that colour.</p>
+            <p className="a-help">
+              The first photograph is the one shown in the shop. Use real photographs of the garment. <strong>Click each photograph on the middle of the suit</strong>: the shop frames the photograph on that point, so the suit fills the picture and the
+              background falls away.
+            </p>
             <div className="a-images">
               {p.images.map((img, ii) => (
                 <div key={img.url} className="a-image">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={img.url} alt="" loading="lazy" />
+                  <button
+                    type="button"
+                    className="a-focus"
+                    aria-label="Set where the suit is in this photograph"
+                    title="Click on the middle of the suit"
+                    onClick={(e) => {
+                      const box = e.currentTarget.getBoundingClientRect()
+                      setImage(ii, { focusX: Math.round(((e.clientX - box.left) / box.width) * 100), focusY: Math.round(((e.clientY - box.top) / box.height) * 100) })
+                    }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={img.url} alt="" loading="lazy" />
+                    <span className="a-focus-dot" style={{ left: `${img.focusX}%`, top: `${img.focusY}%` }} />
+                  </button>
                   <input className="a-input" aria-label="Describe this photograph" placeholder="Describe the photograph" value={img.alt} onChange={(e) => setImage(ii, { alt: e.target.value })} />
                   {p.colours.length > 1 && (
                     <select className="a-select" aria-label="Colour shown" value={img.colourIndex ?? ''} onChange={(e) => setImage(ii, { colourIndex: e.target.value === '' ? null : Number(e.target.value) })}>

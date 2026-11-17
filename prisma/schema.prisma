@@ -170,6 +170,10 @@ model ProductImage {
   alt       String         @default("")
   width     Int            @default(900)
   height    Int            @default(1200)
+  /// Where the garment sits in the photograph, as a percentage from the left and from the top.
+  /// Shop cards are framed on this point so the suit, not the backdrop, fills the frame.
+  focusX    Int            @default(50)
+  focusY    Int            @default(45)
   sortOrder Int            @default(0)
 
   @@index([productId])

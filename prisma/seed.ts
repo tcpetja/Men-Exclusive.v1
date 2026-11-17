@@ -117,7 +117,7 @@ type SeedProduct = {
   description: string
   specs: string
   colour: { name: string; hex: string; family: string }
-  images: { file: string; alt: string; width: number; height: number }[]
+  images: { file: string; alt: string; width: number; height: number; focusX: number; focusY: number }[]
   occasions: string[]
   featured?: boolean
 }
@@ -135,7 +135,7 @@ const products: SeedProduct[] = [
     description: `A black three-piece suit: single-breasted jacket with a notch lapel, a low scooped waistcoat and matching trousers. ${STYLED} ${ASK}`,
     specs: 'Pieces: Jacket, waistcoat and trousers\nJacket: Single-breasted, notch lapel\nWaistcoat: Scooped front',
     colour: { name: 'Black', hex: '#161616', family: 'black' },
-    images: [{ file: 'black-three-piece-suit-scoop-waistcoat.jpg', alt: 'Black three-piece suit with a scooped waistcoat, worn with a white shirt', width: 960, height: 1280 }],
+    images: [{ file: 'black-three-piece-suit-scoop-waistcoat.jpg', alt: 'Black three-piece suit with a scooped waistcoat, worn with a white shirt', width: 960, height: 1280, focusX: 68, focusY: 62 }],
     occasions: ['formal-black-tie', 'weddings', 'matric-dance'],
     featured: true,
   },
@@ -148,7 +148,7 @@ const products: SeedProduct[] = [
     description: `An ivory double-breasted suit with peak lapels, flap pockets and matching trousers. ${STYLED} ${ASK}`,
     specs: 'Pieces shown: Jacket and trousers\nJacket: Double-breasted, peak lapel',
     colour: { name: 'Ivory', hex: '#efe6d6', family: 'ivory' },
-    images: [{ file: 'ivory-double-breasted-suit.jpg', alt: 'Ivory double-breasted suit with a white shirt and burgundy tie', width: 960, height: 1280 }],
+    images: [{ file: 'ivory-double-breasted-suit.jpg', alt: 'Ivory double-breasted suit with a white shirt and burgundy tie', width: 960, height: 1280, focusX: 59, focusY: 63 }],
     occasions: ['weddings', 'matric-dance', 'special-occasions'],
     featured: true,
   },
@@ -162,8 +162,8 @@ const products: SeedProduct[] = [
     specs: 'Pieces: Jacket, waistcoat and trousers\nJacket: Single-breasted, notch lapel\nPattern: Windowpane check',
     colour: { name: 'Navy with rust check', hex: '#2b2d3d', family: 'blue' },
     images: [
-      { file: 'navy-rust-windowpane-three-piece-suit.jpg', alt: 'Navy three-piece suit with a rust windowpane check, white shirt and navy tie', width: 926, height: 1280 },
-      { file: 'navy-rust-windowpane-three-piece-suit-2.jpg', alt: 'The navy and rust windowpane three-piece suit seen from the side', width: 960, height: 1280 },
+      { file: 'navy-rust-windowpane-three-piece-suit.jpg', alt: 'Navy three-piece suit with a rust windowpane check, white shirt and navy tie', width: 926, height: 1280, focusX: 68, focusY: 56 },
+      { file: 'navy-rust-windowpane-three-piece-suit-2.jpg', alt: 'The navy and rust windowpane three-piece suit seen from the side', width: 960, height: 1280, focusX: 63, focusY: 66 },
     ],
     occasions: ['corporate-business', 'business-travel', 'graduation'],
     featured: true,
@@ -177,7 +177,7 @@ const products: SeedProduct[] = [
     description: `A deep forest green three-piece suit: single-breasted jacket, scooped waistcoat and matching trousers. ${STYLED} ${ASK}`,
     specs: 'Pieces: Jacket, waistcoat and trousers\nJacket: Single-breasted, notch lapel\nWaistcoat: Scooped front',
     colour: { name: 'Forest green', hex: '#2f4a45', family: 'green' },
-    images: [{ file: 'forest-green-three-piece-suit.jpg', alt: 'Forest green three-piece suit with a black shirt', width: 960, height: 1280 }],
+    images: [{ file: 'forest-green-three-piece-suit.jpg', alt: 'Forest green three-piece suit with a black shirt', width: 960, height: 1280, focusX: 62, focusY: 64 }],
     occasions: ['weddings', 'matric-dance', 'special-occasions', 'formal-black-tie'],
     featured: true,
   },
@@ -190,7 +190,7 @@ const products: SeedProduct[] = [
     description: `A three-piece suit in a light stone check: single-breasted jacket, scooped waistcoat and matching trousers. ${STYLED} ${ASK}`,
     specs: 'Pieces: Jacket, waistcoat and trousers\nJacket: Single-breasted, notch lapel\nPattern: Check',
     colour: { name: 'Stone check', hex: '#b9b1a6', family: 'grey' },
-    images: [{ file: 'stone-check-three-piece-suit.jpg', alt: 'Light stone check three-piece suit with a black shirt', width: 894, height: 1280 }],
+    images: [{ file: 'stone-check-three-piece-suit.jpg', alt: 'Light stone check three-piece suit with a black shirt', width: 894, height: 1280, focusX: 72, focusY: 58 }],
     occasions: ['corporate-business', 'graduation', 'weddings', 'special-occasions'],
     featured: true,
   },
@@ -203,7 +203,7 @@ const products: SeedProduct[] = [
     description: `A warm cocoa brown double-breasted suit with peak lapels, flap pockets and matching trousers. ${STYLED} ${ASK}`,
     specs: 'Pieces shown: Jacket and trousers\nJacket: Double-breasted, peak lapel',
     colour: { name: 'Cocoa brown', hex: '#8a5a40', family: 'brown' },
-    images: [{ file: 'cocoa-double-breasted-suit.jpg', alt: 'Cocoa brown double-breasted suit with a white shirt', width: 960, height: 1280 }],
+    images: [{ file: 'cocoa-double-breasted-suit.jpg', alt: 'Cocoa brown double-breasted suit with a white shirt', width: 960, height: 1280, focusX: 67, focusY: 63 }],
     occasions: ['special-occasions', 'weddings', 'corporate-business'],
     featured: true,
   },
@@ -216,7 +216,7 @@ const products: SeedProduct[] = [
     description: `A blush pink double-breasted suit with peak lapels, contrast buttons and matching trousers. ${STYLED} ${ASK}`,
     specs: 'Pieces shown: Jacket and trousers\nJacket: Double-breasted, peak lapel\nButtons: Contrast',
     colour: { name: 'Blush pink', hex: '#e6b3ae', family: 'pink' },
-    images: [{ file: 'blush-double-breasted-suit.jpg', alt: 'Blush pink double-breasted suit with a white shirt and burgundy pocket square', width: 870, height: 1280 }],
+    images: [{ file: 'blush-double-breasted-suit.jpg', alt: 'Blush pink double-breasted suit with a white shirt and burgundy pocket square', width: 870, height: 1280, focusX: 72, focusY: 57 }],
     occasions: ['matric-dance', 'weddings', 'special-occasions'],
     featured: true,
   },
@@ -229,7 +229,7 @@ const products: SeedProduct[] = [
     description: `A navy suit with a single-breasted, notch-lapel jacket and matching trousers. ${STYLED} ${ASK}`,
     specs: 'Jacket: Single-breasted, notch lapel',
     colour: { name: 'Navy', hex: '#27375f', family: 'blue' },
-    images: [{ file: 'navy-single-breasted-suit.jpg', alt: 'Navy single-breasted suit with a white shirt', width: 852, height: 1280 }],
+    images: [{ file: 'navy-single-breasted-suit.jpg', alt: 'Navy single-breasted suit with a white shirt', width: 852, height: 1280, focusX: 70, focusY: 58 }],
     occasions: ['corporate-business', 'business-travel', 'graduation'],
     featured: true,
   },
@@ -242,7 +242,7 @@ const products: SeedProduct[] = [
     description: `A black three-piece suit: single-breasted jacket, classic buttoned waistcoat and matching trousers. ${STYLED} ${ASK}`,
     specs: 'Pieces: Jacket, waistcoat and trousers\nJacket: Single-breasted, notch lapel\nWaistcoat: Classic V front',
     colour: { name: 'Black', hex: '#1c1c1c', family: 'black' },
-    images: [{ file: 'black-three-piece-suit.jpg', alt: 'Black three-piece suit worn with a black shirt and olive tie', width: 864, height: 1280 }],
+    images: [{ file: 'black-three-piece-suit.jpg', alt: 'Black three-piece suit worn with a black shirt and olive tie', width: 864, height: 1280, focusX: 69, focusY: 64 }],
     occasions: ['corporate-business', 'formal-black-tie', 'business-travel'],
   },
   {
@@ -254,7 +254,7 @@ const products: SeedProduct[] = [
     description: `A terracotta double-breasted suit with peak lapels, flap pockets and matching trousers. ${STYLED} ${ASK}`,
     specs: 'Pieces shown: Jacket and trousers\nJacket: Double-breasted, peak lapel',
     colour: { name: 'Terracotta', hex: '#b5553a', family: 'red' },
-    images: [{ file: 'terracotta-double-breasted-suit.jpg', alt: 'Terracotta double-breasted suit with a white shirt', width: 776, height: 1280 }],
+    images: [{ file: 'terracotta-double-breasted-suit.jpg', alt: 'Terracotta double-breasted suit with a white shirt', width: 776, height: 1280, focusX: 72, focusY: 60 }],
     occasions: ['special-occasions', 'matric-dance', 'weddings'],
   },
   {
@@ -266,7 +266,7 @@ const products: SeedProduct[] = [
     description: `A citron yellow double-breasted suit with peak lapels, contrast buttons and matching trousers. ${STYLED} ${ASK}`,
     specs: 'Pieces shown: Jacket and trousers\nJacket: Double-breasted, peak lapel\nButtons: Contrast',
     colour: { name: 'Citron yellow', hex: '#d9cf5c', family: 'yellow' },
-    images: [{ file: 'citron-double-breasted-suit.jpg', alt: 'Citron yellow double-breasted suit with a navy shirt', width: 862, height: 1280 }],
+    images: [{ file: 'citron-double-breasted-suit.jpg', alt: 'Citron yellow double-breasted suit with a navy shirt', width: 862, height: 1280, focusX: 73, focusY: 59 }],
     occasions: ['matric-dance', 'special-occasions'],
   },
   {
@@ -278,7 +278,7 @@ const products: SeedProduct[] = [
     description: `An ivory suit with a fine windowpane check and a single-breasted, notch-lapel jacket. ${STYLED} ${ASK}`,
     specs: 'Jacket: Single-breasted, notch lapel\nPattern: Windowpane check',
     colour: { name: 'Ivory windowpane', hex: '#ece9e2', family: 'ivory' },
-    images: [{ file: 'ivory-windowpane-suit.jpg', alt: 'Ivory windowpane check suit with a charcoal shirt and brown tie', width: 960, height: 1280 }],
+    images: [{ file: 'ivory-windowpane-suit.jpg', alt: 'Ivory windowpane check suit with a charcoal shirt and brown tie', width: 960, height: 1280, focusX: 50, focusY: 60 }],
     occasions: ['weddings', 'special-occasions', 'graduation'],
   },
   {
@@ -290,7 +290,7 @@ const products: SeedProduct[] = [
     description: `A soft sage green suit with a single-breasted, notch-lapel jacket and matching trousers. ${STYLED} ${ASK}`,
     specs: 'Jacket: Single-breasted, notch lapel',
     colour: { name: 'Sage', hex: '#b7bba0', family: 'green' },
-    images: [{ file: 'sage-single-breasted-suit.jpg', alt: 'Sage green single-breasted suit with a pale blue shirt', width: 866, height: 1280 }],
+    images: [{ file: 'sage-single-breasted-suit.jpg', alt: 'Sage green single-breasted suit with a pale blue shirt', width: 866, height: 1280, focusX: 70, focusY: 56 }],
     occasions: ['weddings', 'graduation', 'special-occasions'],
   },
   {
@@ -302,7 +302,7 @@ const products: SeedProduct[] = [
     description: `A pale dusty lilac suit with a single-breasted, notch-lapel jacket and matching trousers. ${STYLED} ${ASK}`,
     specs: 'Jacket: Single-breasted, notch lapel',
     colour: { name: 'Dusty lilac', hex: '#d9c3cc', family: 'pink' },
-    images: [{ file: 'lilac-single-breasted-suit.jpg', alt: 'Dusty lilac single-breasted suit with a navy shirt', width: 920, height: 1280 }],
+    images: [{ file: 'lilac-single-breasted-suit.jpg', alt: 'Dusty lilac single-breasted suit with a navy shirt', width: 920, height: 1280, focusX: 50, focusY: 62 }],
     occasions: ['matric-dance', 'weddings', 'special-occasions'],
   },
 ]
@@ -344,6 +344,8 @@ async function main() {
         alt: img.alt,
         width: img.width,
         height: img.height,
+        focusX: img.focusX,
+        focusY: img.focusY,
         sortOrder: i,
       })),
     })

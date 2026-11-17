@@ -23,7 +23,7 @@ export type EditorProduct = {
   sortOrder: number
   occasionIds: string[]
   colours: { id?: string; name: string; hex: string; family: string; variants: { id?: string; size: string; stock: number; sku: string }[] }[]
-  images: { id?: string; url: string; alt: string; width: number; height: number; colourIndex: number | null }[]
+  images: { id?: string; url: string; alt: string; width: number; height: number; focusX: number; focusY: number; colourIndex: number | null }[]
 }
 
 export async function loadEditorProduct(id: string): Promise<EditorProduct | null> {
@@ -64,7 +64,7 @@ export async function loadEditorProduct(id: string): Promise<EditorProduct | nul
       family: c.family,
       variants: c.variants.map((v) => ({ id: v.id, size: v.size, stock: v.stock, sku: v.sku ?? '' })),
     })),
-    images: p.images.map((i) => ({ id: i.id, url: i.url, alt: i.alt, width: i.width, height: i.height, colourIndex: i.colourId ? (colourIndex.get(i.colourId) ?? null) : null })),
+    images: p.images.map((i) => ({ id: i.id, url: i.url, alt: i.alt, width: i.width, height: i.height, focusX: i.focusX, focusY: i.focusY, colourIndex: i.colourId ? (colourIndex.get(i.colourId) ?? null) : null })),
   }
 }
 

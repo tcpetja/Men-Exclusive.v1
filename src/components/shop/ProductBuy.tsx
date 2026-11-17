@@ -2,10 +2,10 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react'
 import { formatZAR } from '@/lib/money'
 import { useBag } from '../cart/CartProvider'
-import { IconCalendar, IconWhatsApp } from '../icons'
+import { IconCalendar, IconClose, IconLock, IconPin, IconWhatsApp } from '../icons'
 
 export type BuyProduct = {
   name: string
@@ -28,6 +28,8 @@ export function ProductBuy({ product, wa }: { product: BuyProduct; wa: { enquire
   const [variantId, setVariantId] = useState<string | null>(inStockSizes.length === 1 ? inStockSizes[0].id : null)
   const [quantity, setQuantity] = useState(1)
   const [imageIndex, setImageIndex] = useState(0)
+  const [viewerOpen, setViewerOpen] = useState(false)
+  const stageRef = useRef<HTMLButtonElement>(null)
 
   const images = useMemo(() => {
     const forColour = p.images.filter((i) => i.colourId === colourId)
@@ -40,6 +42,30 @@ export function ProductBuy({ product, wa }: { product: BuyProduct; wa: { enquire
   const anyStock = p.colours.some((c) => c.variants.some((v) => v.stock > 0))
   const buyable = p.priceCents != null && hasSizes
   const maxQty = Math.min(variant?.stock ?? 1, 10)
+
+  useEffect(() => {
+    if (!viewerOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setViewerOpen(false)
+      if (e.key === 'ArrowRight') setImageIndex((i) => (i + 1) % images.length)
+      if (e.key === 'ArrowLeft') setImageIndex((i) => (i - 1 + images.length) % images.length)
+    }
+    document.addEventListener('keydown', onKey)
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.body.style.overflow = ''
+    }
+  }, [viewerOpen, images.length])
+
+  // Moving the pointer over the photograph draws that spot closer, to look at the cloth.
+  const trackPointer = (e: MouseEvent<HTMLButtonElement>) => {
+    const el = stageRef.current
+    if (!el) return
+    const box = el.getBoundingClientRect()
+    el.style.setProperty('--zx', `${((e.clientX - box.left) / box.width) * 100}%`)
+    el.style.setProperty('--zy', `${((e.clientY - box.top) / box.height) * 100}%`)
+  }
 
   const chooseColour = (id: string) => {
     setColourId(id)
@@ -58,9 +84,9 @@ export function ProductBuy({ product, wa }: { product: BuyProduct; wa: { enquire
   return (
     <div className="pdp">
       <div className={images.length > 1 ? 'gallery gallery-multi' : 'gallery'}>
-        <div className="gallery-main">
-          {image && <Image src={image.url} alt={image.alt || p.name} fill priority sizes="(min-width: 900px) 48vw, 100vw" />}
-        </div>
+        <button ref={stageRef} type="button" className="gallery-main" onMouseMove={trackPointer} onClick={() => setViewerOpen(true)} aria-label="View this photograph full screen">
+          {image && <Image src={image.url} alt={image.alt || p.name} fill priority sizes="(min-width: 900px) 62vw, 100vw" />}
+        </button>
         {images.length > 1 && (
           <div className="gallery-thumbs" role="group" aria-label="Product photographs">
             {images.map((img, i) => (
@@ -73,20 +99,18 @@ export function ProductBuy({ product, wa }: { product: BuyProduct; wa: { enquire
       </div>
 
       <div className="pdp-info">
-        <div className="stack" style={{ gap: 10 }}>
-          {p.categoryName && <p className="muted" style={{ fontSize: '0.84rem' }}>{p.categoryName}</p>}
+        <div className="stack" style={{ gap: 12 }}>
+          {p.categoryName && <p className="pdp-kind">{p.categoryName}</p>}
           <h1 className="pdp-title">{p.name}</h1>
-          <p className="muted" style={{ fontSize: '0.84rem' }}>Ref {p.sku}</p>
+          {p.priceCents != null ? (
+            <p className="pdp-price">
+              {formatZAR(p.priceCents)}
+              {p.compareAtCents != null && p.compareAtCents > p.priceCents && <span className="price-was">{formatZAR(p.compareAtCents)}</span>}
+            </p>
+          ) : (
+            <p className="pdp-price pdp-price-request">Price on request</p>
+          )}
         </div>
-
-        {p.priceCents != null ? (
-          <p className="pdp-price">
-            {formatZAR(p.priceCents)}
-            {p.compareAtCents != null && p.compareAtCents > p.priceCents && <span className="price-was">{formatZAR(p.compareAtCents)}</span>}
-          </p>
-        ) : (
-          <p className="pdp-price gold" style={{ fontSize: '1.05rem' }}>Price on request</p>
-        )}
 
         {p.summary && <p className="soft">{p.summary}</p>}
 
@@ -168,10 +192,10 @@ export function ProductBuy({ product, wa }: { product: BuyProduct; wa: { enquire
           </div>
         ) : (
           <div className="stack" style={{ gap: 12 }}>
-            <p className="notice">
+            <p className="soft">
               {buyable
                 ? 'This suit is sold out online at the moment. Message us and we will check what is available in store.'
-                : 'This suit is available in store. Message us for the price and available sizes, or book a fitting to try it on.'}
+                : 'Available in store. Message us for the price and sizes, or book a fitting to try it on.'}
             </p>
             {wa && (
               <a href={p.priceCents == null ? wa.price : wa.enquire} target="_blank" rel="noopener noreferrer" className="btn btn-gold btn-block">
@@ -184,6 +208,48 @@ export function ProductBuy({ product, wa }: { product: BuyProduct; wa: { enquire
               Book a fitting
             </Link>
           </div>
+        )}
+
+        <ul className="assure">
+          <li>
+            <IconLock />
+            <span>Secure payment by Yoco. Card details never touch this website.</span>
+          </li>
+          <li>
+            <IconCalendar />
+            <span>Fittings and adjustments in store, by appointment.</span>
+          </li>
+          <li>
+            <IconPin />
+            <span>Collection and delivery options are shown at checkout.</span>
+          </li>
+        </ul>
+        <p className="pdp-ref">Ref {p.sku}</p>
+      </div>
+
+      {/* Full-screen viewer */}
+      <div className="viewer" data-open={viewerOpen} role="dialog" aria-modal="true" aria-label={`${p.name}, photograph ${imageIndex + 1} of ${images.length}`} inert={!viewerOpen} onClick={() => setViewerOpen(false)}>
+        {viewerOpen && image && (
+          <>
+            {/* Same size request as the gallery, so the photograph is already loaded and appears at once. */}
+            <Image src={image.url} alt={image.alt || p.name} fill sizes="(min-width: 900px) 62vw, 100vw" />
+            <button type="button" className="iconbtn viewer-close" aria-label="Close" onClick={() => setViewerOpen(false)}>
+              <IconClose />
+            </button>
+            {images.length > 1 && (
+              <div className="viewer-count" onClick={(e) => e.stopPropagation()}>
+                <button type="button" className="textlink" onClick={() => setImageIndex((i) => (i - 1 + images.length) % images.length)}>
+                  Previous
+                </button>
+                <span>
+                  {imageIndex + 1} / {images.length}
+                </span>
+                <button type="button" className="textlink" onClick={() => setImageIndex((i) => (i + 1) % images.length)}>
+                  Next
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

@@ -5,7 +5,7 @@ import { COLOUR_FAMILIES } from './constants'
 import type { Prisma } from '@/generated/prisma/client'
 
 const cardInclude = {
-  images: { orderBy: { sortOrder: 'asc' as const }, take: 2 },
+  images: { orderBy: { sortOrder: 'asc' as const }, take: 1 },
   colours: { orderBy: { sortOrder: 'asc' as const }, include: { variants: true } },
   category: true,
 } satisfies Prisma.ProductInclude
@@ -20,8 +20,7 @@ export type ProductCardData = {
   categoryName: string | null
   priceCents: number | null
   compareAtCents: number | null
-  image: { url: string; alt: string; width: number; height: number } | null
-  hoverImage: { url: string; alt: string } | null
+  image: { url: string; alt: string; width: number; height: number; focusX: number; focusY: number } | null
   colours: { name: string; hex: string }[]
   /** In stock in at least one size. */
   inStock: boolean
@@ -33,7 +32,7 @@ export type ProductCardData = {
 
 export function toCard(p: ProductWithCard): ProductCardData {
   const inStock = p.colours.some((c) => c.variants.some((v) => v.stock > 0))
-  const [first, second] = p.images
+  const [first] = p.images
   return {
     id: p.id,
     slug: p.slug,
@@ -42,8 +41,7 @@ export function toCard(p: ProductWithCard): ProductCardData {
     categoryName: p.category?.name ?? null,
     priceCents: p.priceCents,
     compareAtCents: p.compareAtCents,
-    image: first ? { url: first.url, alt: first.alt || p.name, width: first.width, height: first.height } : null,
-    hoverImage: second ? { url: second.url, alt: second.alt || p.name } : null,
+    image: first ? { url: first.url, alt: first.alt || p.name, width: first.width, height: first.height, focusX: first.focusX, focusY: first.focusY } : null,
     colours: p.colours.map((c) => ({ name: c.name, hex: c.hex })),
     inStock,
     purchasable: inStock && p.priceCents != null,

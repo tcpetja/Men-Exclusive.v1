@@ -14,6 +14,9 @@ export async function Footer() {
 
   return (
     <footer className="footer on-coal">
+      <div className="wrap footer-top">
+        <p className="footer-line">Power in presence. Elegance in detail. Distinction in every occasion.</p>
+      </div>
       <div className="wrap footer-grid">
         <div>
           <h2>Visit the store</h2>

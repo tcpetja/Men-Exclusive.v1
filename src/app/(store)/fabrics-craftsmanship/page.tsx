@@ -1,10 +1,8 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import Link from 'next/link'
 import { Crumbs } from '@/components/JsonLd'
 import { Markdown } from '@/components/Markdown'
 import { WhatsAppButton } from '@/components/WhatsApp'
-import { listProducts } from '@/lib/catalog'
 import { getContents } from '@/lib/content'
 
 export const metadata: Metadata = {
@@ -23,10 +21,7 @@ const PROCESS = [
 ]
 
 export default async function FabricsPage() {
-  const [content, products] = await Promise.all([getContents(['fabrics.intro', 'fabrics.body', 'fabrics.care']), listProducts({}, 40)])
-  const patterned = products.filter((p) => p.image && /check|windowpane/i.test(p.name))
-  const plain = products.filter((p) => p.image && !/check|windowpane/i.test(p.name))
-  const closeUps = [patterned[0], plain[1] ?? plain[0], patterned[1] ?? plain[2]].filter(Boolean)
+  const content = await getContents(['fabrics.intro', 'fabrics.body', 'fabrics.care'])
 
   return (
     <div className="wrap">
@@ -35,17 +30,6 @@ export default async function FabricsPage() {
         <h1 className="display">Fabrics and craftsmanship</h1>
         <p className="lede">{content['fabrics.intro']}</p>
       </header>
-
-      {closeUps.length > 0 && (
-        <div className="grid" style={{ gridTemplateColumns: `repeat(${closeUps.length}, minmax(0, 1fr))`, gap: 'clamp(8px, 1.4vw, 18px)' }}>
-          {closeUps.map((p) => (
-            <Link key={p.id} href={`/shop/${p.slug}`} className="split-media" style={{ aspectRatio: '1 / 1.1' }} aria-label={`${p.name}: view suit`}>
-              {/* Close crops of our own product photographs, so the cloth is what you see. */}
-              <Image src={p.image!.url} alt={`Close view of the ${p.name.toLowerCase()}`} fill sizes="33vw" style={{ objectPosition: '66% 44%', transform: 'scale(1.9)' }} />
-            </Link>
-          ))}
-        </div>
-      )}
 
       <section className="section">
         <div className="split" style={{ alignItems: 'start' }}>

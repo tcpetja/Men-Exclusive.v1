@@ -1,9 +1,8 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import Link from 'next/link'
 import { Crumbs } from '@/components/JsonLd'
+import { OccasionIndex } from '@/components/OccasionIndex'
 import { WhatsAppButton } from '@/components/WhatsApp'
-import { db } from '@/lib/db'
 import { waMessages } from '@/lib/whatsapp'
 
 export const metadata: Metadata = {
@@ -13,21 +12,7 @@ export const metadata: Metadata = {
   alternates: { canonical: '/occasions' },
 }
 
-export default async function OccasionsPage() {
-  const occasions = await db.occasion.findMany({
-    orderBy: { sortOrder: 'asc' },
-    include: {
-      _count: { select: { products: { where: { isActive: true } } } },
-      products: { where: { isActive: true }, orderBy: { sortOrder: 'asc' }, take: 8, select: { id: true, images: { orderBy: { sortOrder: 'asc' }, take: 1, select: { url: true } } } },
-    },
-  })
-  const used = new Set<string>()
-  const tiles = occasions.map((o) => {
-    const pick = o.products.find((p) => p.images[0] && !used.has(p.id)) ?? o.products.find((p) => p.images[0])
-    if (pick) used.add(pick.id)
-    return { ...o, image: pick?.images[0]?.url ?? null }
-  })
-
+export default function OccasionsPage() {
   return (
     <div className="wrap">
       <header className="pagehead">
@@ -35,16 +20,8 @@ export default async function OccasionsPage() {
         <h1 className="display">Shop by occasion</h1>
         <p className="lede">You do not need to know suits to choose a good one. Start with where you are going, and we will show you what works.</p>
       </header>
-      <div className="occasions" style={{ paddingBottom: 'clamp(40px, 6vw, 72px)' }}>
-        {tiles.map((o) => (
-          <Link key={o.slug} href={`/occasions/${o.slug}`} className="occasion">
-            {o.image && <Image src={o.image} alt="" fill sizes="(min-width: 900px) 25vw, 50vw" />}
-            <span className="occasion-cap">
-              <span className="occasion-name">{o.name}</span>
-              <span className="occasion-meta">{o._count.products > 0 ? `${o._count.products} ${o._count.products === 1 ? 'suit' : 'suits'}` : 'Ask us for options'}</span>
-            </span>
-          </Link>
-        ))}
+      <div style={{ paddingBottom: 'clamp(48px, 7vw, 96px)' }}>
+        <OccasionIndex />
       </div>
       <section className="section-tight rule-top">
         <div className="stack" style={{ maxWidth: 620 }}>

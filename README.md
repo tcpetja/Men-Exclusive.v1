@@ -183,6 +183,7 @@ npm run admin:create -- name@example.com "a long password"
 ```
 
 - **To put a suit on sale:** Products and stock → open the suit → enter the price → add sizes (type `46, 48, 50` and press Add sizes) → enter the stock for each → Save. The message under the form tells you whether customers can now buy it.
+- **When you add a photograph:** click it on the middle of the suit. The shop frames every photograph on that point and lets the background fade away, so the suit is what customers see. The product page still shows the full, untouched photograph.
 - **When an order arrives:** Orders → open it → choose the next step (start preparing, ready for collection or dispatched, then collected or delivered). The customer is emailed each time.
 - **To refund:** open the order → Refund. A full refund of an order that has not left the store puts its items back into stock automatically.
 - **Orders marked “Needs attention”:** something unusual happened with a payment (for example a payment for the wrong amount, or a payment that arrived after the items were sold to someone else). The order explains what to do.

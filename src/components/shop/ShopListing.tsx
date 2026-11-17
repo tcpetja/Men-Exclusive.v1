@@ -49,8 +49,13 @@ export async function ShopListing({
 }) {
   const filters = { ...parseFilters(searchParams), ...scope }
   const [products, facets] = await Promise.all([listProducts(filters), getFacets(scope)])
-  const active =
-    Boolean(filters.category) || (filters.colours?.length ?? 0) > 0 || (filters.sizes?.length ?? 0) > 0 || filters.minCents != null || filters.maxCents != null || filters.inStockOnly
+  const activeCount =
+    Number(Boolean(filters.category)) +
+    (filters.colours?.length ?? 0) +
+    (filters.sizes?.length ?? 0) +
+    Number(filters.minCents != null || filters.maxCents != null) +
+    Number(Boolean(filters.inStockOnly))
+  const active = activeCount > 0
   const clearHref = scope.q ? `${basePath}?q=${encodeURIComponent(scope.q)}` : basePath
 
   const bar = (
@@ -145,24 +150,21 @@ export async function ShopListing({
           </label>
         </div>
       )}
-      <div className="actions" style={{ paddingTop: 18 }}>
-        <button type="submit" className="btn btn-line btn-sm">
-          Apply filters
-        </button>
-        {active && (
-          <Link href={clearHref} className="link" style={{ fontSize: '0.84rem' }}>
-            Clear all
+      {active && (
+        <div style={{ paddingTop: 18 }}>
+          <Link href={clearHref} className="link" style={{ fontSize: '0.86rem' }}>
+            Clear all filters
           </Link>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   )
 
   return (
     // The panel is remounted when filters are cleared so that its checkboxes reset.
-    <FiltersForm basePath={basePath} bar={bar} panel={<div key={active ? 'filtered' : 'clear'}>{panel}</div>}>
+    <FiltersForm basePath={basePath} bar={bar} count={products.length} activeCount={activeCount} panel={<div key={active ? 'filtered' : 'clear'}>{panel}</div>}>
       {products.length > 0 ? (
-        <ProductGrid products={products} four={false} />
+        <ProductGrid products={products} />
       ) : (
         <div className="empty">
           <h2 className="display-sm">{emptyMessage ?? 'No suits match those filters.'}</h2>

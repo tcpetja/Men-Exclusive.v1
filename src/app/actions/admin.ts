@@ -423,6 +423,8 @@ const productSchema = z.object({
         alt: z.string().trim().max(200),
         width: z.number().int().min(1).max(10000),
         height: z.number().int().min(1).max(10000),
+        focusX: z.number().int().min(0).max(100),
+        focusY: z.number().int().min(0).max(100),
         colourIndex: z.number().int().min(0).nullable(),
       }),
     )
@@ -517,7 +519,7 @@ export async function saveProductAction(input: ProductInput): Promise<SaveProduc
       const keepImages = d.images.map((i) => i.id).filter((x): x is string => Boolean(x))
       await tx.productImage.deleteMany({ where: { productId: product.id, id: { notIn: keepImages } } })
       for (const [ii, img] of d.images.entries()) {
-        const imageData = { url: img.url, alt: img.alt, width: img.width, height: img.height, sortOrder: ii, colourId: img.colourIndex != null ? (colourIds[img.colourIndex] ?? null) : null }
+        const imageData = { url: img.url, alt: img.alt, width: img.width, height: img.height, focusX: img.focusX, focusY: img.focusY, sortOrder: ii, colourId: img.colourIndex != null ? (colourIds[img.colourIndex] ?? null) : null }
         if (img.id) await tx.productImage.update({ where: { id: img.id, productId: product.id }, data: imageData })
         else await tx.productImage.create({ data: { ...imageData, productId: product.id } })
       }

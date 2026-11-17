@@ -3,7 +3,6 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Crumbs } from '@/components/JsonLd'
 import { Markdown, Paragraphs } from '@/components/Markdown'
-import { listProducts } from '@/lib/catalog'
 import { getContents } from '@/lib/content'
 
 export const metadata: Metadata = {
@@ -13,8 +12,7 @@ export const metadata: Metadata = {
 }
 
 export default async function OurStoryPage() {
-  const [content, products] = await Promise.all([getContents(['story.body', 'story.founder', 'story.founderName', 'home.story']), listProducts({}, 6)])
-  const photo = products.find((p) => p.image)?.image
+  const content = await getContents(['story.body', 'story.founder', 'story.founderName', 'home.story'])
 
   return (
     <>
@@ -35,13 +33,8 @@ export default async function OurStoryPage() {
       </section>
 
       <section className="section">
-        <div className="wrap split" style={{ alignItems: 'start' }}>
+        <div className="wrap wrap-narrow">
           <Markdown source={content['story.body']} />
-          {photo && (
-            <div className="split-media" style={{ position: 'sticky', top: 'calc(var(--header-h) + 70px)' }}>
-              <Image src={photo.url} alt={photo.alt} fill sizes="(min-width: 900px) 45vw, 100vw" />
-            </div>
-          )}
         </div>
       </section>
 

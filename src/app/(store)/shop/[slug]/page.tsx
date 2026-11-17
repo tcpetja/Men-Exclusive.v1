@@ -174,7 +174,7 @@ export default async function ProductPage({ params }: Props) {
           <div className="head">
             <h2 className="display-sm">You may also like</h2>
           </div>
-          <ProductGrid products={related} />
+          <ProductGrid products={related} columns={4} />
         </section>
       )}
 

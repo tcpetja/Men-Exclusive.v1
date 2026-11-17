@@ -25,6 +25,8 @@ export function HeaderClient({ whatsappHref, banner, signedIn, isAdmin }: Props)
   const bag = useBag()
   const [menuOpen, setMenuOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
+  const [compact, setCompact] = useState(false)
+  const [lifted, setLifted] = useState(false)
   const searchRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -35,6 +37,30 @@ export function HeaderClient({ whatsappHref, banner, signedIn, isAdmin }: Props)
   useEffect(() => {
     if (searchOpen) searchRef.current?.focus()
   }, [searchOpen])
+
+  // The header steps back while you read down the page and returns the moment you scroll up.
+  useEffect(() => {
+    let last = window.scrollY
+    let ticking = false
+    const update = () => {
+      const y = window.scrollY
+      setLifted(y > 8)
+      if (y < 160) setCompact(false)
+      else if (y > last + 6) setCompact(true)
+      else if (y < last - 6) setCompact(false)
+      last = y
+      ticking = false
+    }
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true
+        requestAnimationFrame(update)
+      }
+    }
+    update()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   useEffect(() => {
     if (!menuOpen && !searchOpen) return
@@ -60,7 +86,7 @@ export function HeaderClient({ whatsappHref, banner, signedIn, isAdmin }: Props)
           {banner.linkUrl && <Link href={banner.linkUrl}>{banner.linkLabel || 'Find out more'}</Link>}
         </div>
       )}
-      <header className="header">
+      <header className="header" data-compact={compact} data-lifted={lifted}>
         <div className="wrap header-bar">
           <div className="header-side">
             <button type="button" className="iconbtn menu-toggle" onClick={() => setMenuOpen(true)} aria-label="Open menu" aria-expanded={menuOpen}>
@@ -135,26 +161,32 @@ export function HeaderClient({ whatsappHref, banner, signedIn, isAdmin }: Props)
         </div>
       </div>
 
-      {/* Mobile menu */}
-      <div className="scrim" data-open={menuOpen} onClick={() => setMenuOpen(false)} aria-hidden />
-      <aside className="drawer drawer-left" data-open={menuOpen} role="dialog" aria-modal="true" aria-label="Menu" inert={!menuOpen}>
-        <div className="drawer-head">
-          <span className="drawer-title">Menu</span>
+      {/* Full-screen menu for phones and tablets */}
+      <div className="menu" data-open={menuOpen} role="dialog" aria-modal="true" aria-label="Menu" inert={!menuOpen}>
+        <div className="menu-head">
+          <span className="wordmark-name" style={{ color: 'var(--gold-3)' }}>
+            MEN EXCLUSIVE
+          </span>
           <button type="button" className="iconbtn" onClick={() => setMenuOpen(false)} aria-label="Close menu">
             <IconClose />
           </button>
         </div>
-        <nav className="drawer-body" aria-label="Mobile">
-          <ul className="menu-list">
-            {NAV_LINKS.map((l) => (
-              <li key={l.href}>
+        <nav className="menu-body" aria-label="Mobile">
+          <ul className="menu-links">
+            {NAV_LINKS.map((l, i) => (
+              <li key={l.href} style={{ transitionDelay: menuOpen ? `${80 + i * 45}ms` : '0ms' }}>
                 <Link href={l.href} aria-current={isCurrent(pathname, l.href) ? 'page' : undefined}>
                   {l.label}
                 </Link>
               </li>
             ))}
+          </ul>
+          <ul className="menu-minor">
             <li>
               <Link href={signedIn ? '/account' : '/account/login'}>{signedIn ? 'Your account' : 'Sign in or register'}</Link>
+            </li>
+            <li>
+              <Link href="/cart">Your bag{bag.ready && bag.count > 0 ? ` (${bag.count})` : ''}</Link>
             </li>
             {isAdmin && (
               <li>
@@ -163,7 +195,7 @@ export function HeaderClient({ whatsappHref, banner, signedIn, isAdmin }: Props)
             )}
           </ul>
         </nav>
-        <div className="drawer-foot">
+        <div className="menu-foot">
           <Link href="/book" className="btn btn-gold btn-block">
             <IconCalendar />
             Book an appointment
@@ -173,7 +205,7 @@ export function HeaderClient({ whatsappHref, banner, signedIn, isAdmin }: Props)
             Chat on WhatsApp
           </a>
         </div>
-      </aside>
+      </div>
     </>
   )
 }

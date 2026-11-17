@@ -1,25 +1,18 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import type { ProductCardData } from '@/lib/catalog'
 import { formatZAR } from '@/lib/money'
+import { Shot } from './Shot'
 
-export function ProductCard({ product, sizes, priority = false }: { product: ProductCardData; sizes?: string; priority?: boolean }) {
+const CARD_SIZES = '(min-width: 1100px) 44vw, (min-width: 760px) 46vw, 70vw'
+
+export function ProductCard({ product, sizes = CARD_SIZES, priority = false }: { product: ProductCardData; sizes?: string; priority?: boolean }) {
   const p = product
   const tag = p.priceCents != null && !p.inStock && p.colours.length > 0 ? 'Sold out' : p.isNewArrival ? 'New' : p.isBestSeller ? 'Best seller' : null
   return (
     <Link href={`/shop/${p.slug}`} className="card">
       <div className="card-media">
+        {p.image && <Shot image={p.image} sizes={sizes} priority={priority} />}
         {tag && <span className="tag">{tag}</span>}
-        {p.image && (
-          <Image
-            src={p.image.url}
-            alt={p.image.alt}
-            fill
-            sizes={sizes ?? '(min-width: 1100px) 25vw, (min-width: 760px) 33vw, 50vw'}
-            priority={priority}
-          />
-        )}
-        {p.hoverImage && <Image src={p.hoverImage.url} alt="" fill sizes={sizes ?? '(min-width: 1100px) 25vw, (min-width: 760px) 33vw, 50vw'} className="card-alt" />}
       </div>
       <div className="card-body">
         <h3 className="card-name">{p.name}</h3>
@@ -43,11 +36,11 @@ export function ProductCard({ product, sizes, priority = false }: { product: Pro
   )
 }
 
-export function ProductGrid({ products, four = true }: { products: ProductCardData[]; four?: boolean }) {
+export function ProductGrid({ products, columns = 3 }: { products: ProductCardData[]; columns?: 3 | 4 }) {
   return (
-    <div className={four ? 'grid grid-4' : 'grid'}>
+    <div className={columns === 4 ? 'grid grid-4' : 'grid'}>
       {products.map((p, i) => (
-        <ProductCard key={p.id} product={p} priority={i < 4} />
+        <ProductCard key={p.id} product={p} priority={i < 3} />
       ))}
     </div>
   )

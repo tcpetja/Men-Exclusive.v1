@@ -1,13 +1,16 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useRef, useState, useTransition, type ReactNode } from 'react'
+import { useEffect, useRef, useState, useTransition, type ReactNode } from 'react'
+import { IconClose } from '../icons'
 
 /**
- * Wraps the filter controls in a GET form. With JavaScript, any change updates the results straight away;
- * without it, the "Apply filters" button submits the form normally.
+ * The shop's filters live in a panel that slides in from the side, so the page itself stays calm:
+ * a count, a Filter button, a sort menu and the suits.
+ *
+ * With JavaScript, any change updates the results straight away. Without it, the form submits normally.
  */
-export function FiltersForm({ basePath, bar, panel, children }: { basePath: string; bar: ReactNode; panel: ReactNode; children: ReactNode }) {
+export function FiltersForm({ basePath, bar, panel, count, activeCount, children }: { basePath: string; bar: ReactNode; panel: ReactNode; count: number; activeCount: number; children: ReactNode }) {
   const router = useRouter()
   const formRef = useRef<HTMLFormElement>(null)
   const [open, setOpen] = useState(false)
@@ -24,6 +27,17 @@ export function FiltersForm({ basePath, bar, panel, children }: { basePath: stri
     startTransition(() => router.replace(qs ? `${basePath}?${qs}` : basePath, { scroll: false }))
   }
 
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
+    document.addEventListener('keydown', onKey)
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.body.style.overflow = ''
+    }
+  }, [open])
+
   return (
     <form
       ref={formRef}
@@ -33,21 +47,34 @@ export function FiltersForm({ basePath, bar, panel, children }: { basePath: stri
       onSubmit={(e) => {
         e.preventDefault()
         apply()
+        setOpen(false)
       }}
     >
       <div className="shopbar">
-        <button type="button" className="btn btn-line btn-sm filters-toggle" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
-          {open ? 'Hide filters' : 'Filter'}
+        <button type="button" className="shopbar-filter" aria-expanded={open} onClick={() => setOpen(true)}>
+          Filter{activeCount > 0 ? ` (${activeCount})` : ''}
         </button>
         {bar}
       </div>
-      <div className="shop">
-        <aside className="filters-panel" data-open={open} aria-label="Filters">
-          {panel}
-        </aside>
-        <div aria-busy={pending} style={{ opacity: pending ? 0.55 : 1, transition: 'opacity .15s' }}>
-          {children}
+
+      <div className="scrim" data-open={open} onClick={() => setOpen(false)} aria-hidden />
+      <aside className="drawer drawer-left filters-drawer" data-open={open} aria-label="Filters" inert={!open}>
+        <div className="drawer-head">
+          <span className="drawer-title">Filter</span>
+          <button type="button" className="iconbtn" onClick={() => setOpen(false)} aria-label="Close filters">
+            <IconClose />
+          </button>
         </div>
+        <div className="drawer-body">{panel}</div>
+        <div className="drawer-foot">
+          <button type="submit" className="btn btn-gold btn-block">
+            {pending ? 'Updating…' : `Show ${count} ${count === 1 ? 'suit' : 'suits'}`}
+          </button>
+        </div>
+      </aside>
+
+      <div aria-busy={pending} style={{ opacity: pending ? 0.5 : 1, transition: 'opacity .2s' }}>
+        {children}
       </div>
     </form>
   )
