@@ -1,0 +1,9 @@
+# Never upload local settings or build output to Vercel.
+.env
+.env.*
+!.env.example
+node_modules
+.next
+src/generated
+.git
+*.tsbuildinfo

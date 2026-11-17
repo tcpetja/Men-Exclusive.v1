@@ -1,0 +1,43 @@
+# Two ways to use this file:
+#
+#   Local development database only:
+#       docker compose up -d db
+#       then set DATABASE_URL="postgresql://menex:menex@localhost:5432/menexclusive" in .env
+#
+#   Whole site on one server (self-hosting):
+#       create a .env file from .env.example, then
+#       docker compose --profile site up -d --build
+#       Put a reverse proxy with HTTPS (for example Caddy or nginx) in front of port 3000.
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: menex
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-menex}
+      POSTGRES_DB: menexclusive
+    ports:
+      - '127.0.0.1:5432:5432'
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U menex -d menexclusive']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  web:
+    profiles: ['site']
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://menex:${POSTGRES_PASSWORD:-menex}@db:5432/menexclusive
+    ports:
+      - '3000:3000'
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  dbdata:
